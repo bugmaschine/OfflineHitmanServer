@@ -1,0 +1,12 @@
+{
+  "_comment": "Fill in your server's info and save as 'serverTile.json'",
+  "title": "Self-hosted",
+  "image": "images/livetile/tile_getopulent_small.jpg",
+  "icon": "story",
+  "url": "",
+  "select": {
+    "header": "",
+    "title": "",
+    "icon": ""
+  }
+}

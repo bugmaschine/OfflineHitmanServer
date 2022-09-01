@@ -1,0 +1,65 @@
+{
+  "controller": "list",
+  "id": "leaderboard",
+  "pressable": false,
+  "actions": {
+    "parentcontextpushed": {
+      "set-selected": {
+        "target": "leaderboard_button_container",
+        "post-restore-original-selection": true
+      }
+    }
+  },
+  "children": [
+    {
+      "controller": "group",
+      "id": "leaderboard_container",
+      "row": 1,
+      "col": 0,
+      "pressable": false,
+      "selectable": true,
+      "actions": {
+        "$if $not $arg _isingame": {
+          "$then": {
+            "on-add-child": {
+              "show-background-layers": {
+                "showMenuBackgroundFullOverlay": true
+              }
+            },
+            "on-remove-child": {
+              "show-background-layers": {
+                "showMenuBackgroundFullOverlay": false
+              }
+            },
+            "on-page-closed": {
+              "show-background-layers": {
+                "showMenuBackgroundFullOverlay": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "controller": "list",
+      "direction": "horizontal",
+      "row": 1,
+      "col": 0,
+      "id": "leaderboard",
+      "children": [
+        {
+          "id": "leaderboard_button_container",
+          "groupselect": true,
+          "controller": "context",
+          "contextmode": "jump",
+          "container": "leaderboard_container",
+          "navigationmode": "list",
+          "loopedselection": false,
+          "view": "menu3.containers.ListContainer",
+          "direction": "vertical",
+          "children": {}
+        }
+      ]
+    }
+  ]
+}

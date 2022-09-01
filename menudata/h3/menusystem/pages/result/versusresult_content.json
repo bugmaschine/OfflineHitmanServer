@@ -1,0 +1,338 @@
+{
+  "id": "versusresult_root",
+  "controller": "container",
+  "children": [
+    {
+      "$datacontext": {
+        "in": "$.",
+        "datavalues": {
+          "IsWinner": {
+            "$if $not $isnull $.data.IsWinner": {
+              "$then": "$.data.IsWinner",
+              "$else": "{$versusinfo}.IsWinner"
+            }
+          },
+          "IsDraw": {
+            "$if $not $isnull $.data.IsDraw": {
+              "$then": "$.data.IsDraw",
+              "$else": "{$versusinfo}.IsDraw"
+            }
+          },
+          "Score": {
+            "$if $not $isnull $.data.Score": {
+              "$then": "$.data.Score",
+              "$else": "{$versusinfo}.Score"
+            }
+          },
+          "ScoreOpponent": {
+            "$if $not $isnull $.data.ScoreOpponent": {
+              "$then": "$.data.ScoreOpponent",
+              "$else": "{$versusinfo}.ScoreOpponent"
+            }
+          },
+          "MatchOverCondition": {
+            "$if $not $isnull $.data.MatchOverCondition": {
+              "$then": "$.data.MatchOverCondition",
+              "$else": "{$versusinfo}.MatchOverCondition"
+            }
+          },
+          "MatchOverConditionName": {
+            "$if $not $isnull $.data.MatchOverConditionName": {
+              "$then": "$.data.MatchOverConditionName",
+              "$else": "{$versusinfo}.MatchOverConditionName"
+            }
+          },
+          "ProfileLevel": {
+            "$if $not $isnull $.data.ProfileLevel": {
+              "$then": "$.data.ProfileLevel",
+              "$else": "{$multiplayerinfo $multiplayerlocalid}.profilelevel"
+            }
+          },
+          "ProfileLevelOpponent": {
+            "$if $not $isnull $.data.ProfileLevelOpponent": {
+              "$then": "$.data.ProfileLevelOpponent",
+              "$else": "{$multiplayerinfo $multiplayerjoinedids[0]}.profilelevel"
+            }
+          },
+          "Disguise": {
+            "$if $not $isnull $.data.Disguise": {
+              "$then": "$.data.Disguise",
+              "$else": "{$multiplayerinfo $multiplayerlocalid}.disguise"
+            }
+          },
+          "DisguiseOpponent": {
+            "$if $not $isnull $.data.DisguiseOpponent": {
+              "$then": "$.data.DisguiseOpponent",
+              "$else": "{$multiplayerinfo $multiplayerjoinedids[0]}.disguise"
+            }
+          },
+          "MatchStats": {
+            "$if $not $isnull $.data.MatchStats": {
+              "$then": "$.data.MatchStats",
+              "$else": "$.@global.MatchStats"
+            }
+          }
+        },
+        "do": {
+          "id": "versusresult_content",
+          "controler": "container",
+          "actions": {
+            "activated": [
+              {
+                "trigger-ui-sound-event": {
+                  "eventname": {
+                    "$if $.IsDraw": {
+                      "$then": "PAGE_ENTERED_result_neutral",
+                      "$else": {
+                        "$if $.IsWinner": {
+                          "$then": "PAGE_ENTERED_result_winner",
+                          "$else": "PAGE_ENTERED_result_looser"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "call": {
+                  "onmenuframe": true,
+                  "method": "showMenuTabsUnderlay",
+                  "args": false
+                }
+              },
+              {
+                "call": {
+                  "onmenuframe": true,
+                  "method": "showMenuDarkBackdrop",
+                  "args": true
+                }
+              },
+              {
+                "call": {
+                  "onmenuframe": true,
+                  "method": "showMenuDarkBackdropLevelEnd",
+                  "args": false
+                }
+              },
+              {
+                "call": {
+                  "onmenuframe": true,
+                  "method": "showMenuRedBackdropLevelEnd",
+                  "args": false
+                }
+              },
+              {
+                "$if $isnull $.MatchStats": {
+                  "$then": {
+                    "$include": {
+                      "$path": "menusystem/pages/result/content/async_isready.json"
+                    }
+                  }
+                }
+              }
+            ],
+            "accept": {
+              "prompt_label": "$loc UI_BUTTON_PROMPTS_ACTION_NEXT",
+              "link": {
+                "page": "missionendready",
+                "clearhistory": true,
+                "args": {}
+              }
+            },
+            "actionx": {
+              "$if {$multiplayerinfo $multiplayerjoinedids[0]}.isconnected": {
+                "$then": {
+                  "prompt_label": "$loc UI_MENU_LOBBY_REMATCH",
+                  "restart-level": {}
+                }
+              }
+            }
+          },
+          "children": [
+            {
+              "_comment": "this element will be replaced by the async-calls",
+              "id": "statistics_data",
+              "selectable": false,
+              "pressable": false
+            },
+            {
+              "$if $not $eq ($.MatchOverConditionName,CompletedNormally)": {
+                "$then": {
+                  "controller": "group",
+                  "id": "headline_container",
+                  "row": 4.25,
+                  "col": 0,
+                  "selectable": false,
+                  "pressable": false,
+                  "_comment": "the container that will hold the HeadlineElement. It will show info on whatever item is selected",
+                  "children": [
+                    {
+                      "id": "headline_element",
+                      "view": "menu3.basic.HeadlineElement",
+                      "data": {
+                        "header": "$loc UI_MENU_MULTIPLAYER_MATCH_ENDED",
+                        "title": {
+                          "$switch $.MatchOverConditionName": [
+                            {
+                              "case": "OpponentsDisconnected",
+                              "return": "$loc UI_MULTIPLAYER_ERROR_PEER_DISCONNECTED"
+                            },
+                            {
+                              "case": "OpponentsAbandoned",
+                              "return": "$loc UI_MULTIPLAYER_ERROR_PEER_CLOSED_CONNECTION"
+                            }
+                          ]
+                        },
+                        "largetitle": false,
+                        "icon": "warning",
+                        "popupMode": true,
+                        "useDottedLine": false
+                      }
+                    }
+                  ]
+                },
+                "$else": null
+              }
+            },
+            {
+              "id": "playpagebuttons",
+              "controller": "list",
+              "direction": "horizontal",
+              "selectable": false,
+              "children": [
+                {
+                  "id": "localplayer",
+                  "view": "menu3.missionend.MissionEndMultiplayerScore",
+                  "col": 0.8,
+                  "row": {
+                    "$if $eq ($.MatchOverConditionName,CompletedNormally)": {
+                      "$then": 1,
+                      "$else": 0.7
+                    }
+                  },
+                  "selectable": false,
+                  "data": {
+                    "profilename": "$user $profileid",
+                    "score": "$formatstring {$.Score,.0}",
+                    "profilelevel": "$.ProfileLevel",
+                    "islocalplayer": true,
+                    "winnertext": "$loc UI_MENU_GAME_MODE_WINNER",
+                    "iswinner": {
+                      "$and": [
+                        "$not $.IsResultOfAbandon",
+                        "$.IsWinner"
+                      ]
+                    },
+                    "image": {
+                      "$if $not $isnullorempty {$repository $.Disguise}.ImageTransparent": {
+                        "$then": "$res {$repository $.Disguise}.ImageTransparent",
+                        "$else": "$res {$repository $.Disguise}.Image"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "opponent",
+                  "view": "menu3.missionend.MissionEndMultiplayerScore",
+                  "col": 5.2,
+                  "row": {
+                    "$if $eq ($.MatchOverConditionName,CompletedNormally)": {
+                      "$then": 1,
+                      "$else": 0.7
+                    }
+                  },
+                  "selectable": false,
+                  "data": {
+                    "profilename": {
+                      "$if $not $isnullorempty $multiplayerjoinedids": {
+                        "$then": "$user {$multiplayerinfo $multiplayerjoinedids[0]}.profileid",
+                        "$else": null
+                      }
+                    },
+                    "score": "$formatstring {$.ScoreOpponent,.0}",
+                    "profilelevel": "$.ProfileLevelOpponent",
+                    "islocalplayer": false,
+                    "winnertext": "$loc UI_MENU_GAME_MODE_WINNER",
+                    "iswinner": {
+                      "$and": [
+                        "$eq ($.MatchOverConditionName,CompletedNormally)",
+                        "$not $.IsWinner"
+                      ]
+                    },
+                    "image": {
+                      "$if $not $isnullorempty {$repository $.DisguiseOpponent}.ImageTransparent": {
+                        "$then": "$res {$repository $.DisguiseOpponent}.ImageTransparent",
+                        "$else": "$res {$repository $.DisguiseOpponent}.Image"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "statistics",
+              "view": "menu3.missionend.MissionEndMultiplayerScoreStatistics",
+              "col": 5,
+              "row": {
+                "$if $eq ($.MatchOverConditionName,CompletedNormally)": {
+                  "$then": 1,
+                  "$else": 0.7
+                }
+              },
+              "data": {
+                "$if": {
+                  "$condition": {
+                    "$and": [
+                      "$not $isnull $.MatchStats.isReady",
+                      "$.MatchStats.isReady"
+                    ]
+                  },
+                  "$then": {
+                    "stats": [
+                      {
+                        "name": "$loc UI_MENU_MATCH_STATS_UNNOTICED_KILLS",
+                        "player1": "{$.MatchStats.Players[0]}.Data.UnnoticedKills",
+                        "player2": "{$.MatchStats.Players[1]}.Data.UnnoticedKills"
+                      },
+                      {
+                        "name": "$loc UI_MENU_MATCH_STATS_PACIFIED_NPCS",
+                        "player1": "{$.MatchStats.Players[0]}.Data.PacifiedNpcs",
+                        "player2": "{$.MatchStats.Players[1]}.Data.PacifiedNpcs"
+                      },
+                      {
+                        "name": "$loc UI_MENU_MATCH_STATS_NPC_KILLS",
+                        "player1": "{$.MatchStats.Players[0]}.Data.KilledNpcs",
+                        "player2": "{$.MatchStats.Players[1]}.Data.KilledNpcs"
+                      },
+                      {
+                        "name": "$loc UI_MENU_MATCH_STATS_BODIES_HIDDEN",
+                        "player1": "{$.MatchStats.Players[0]}.Data.BodiesHidden",
+                        "player2": "{$.MatchStats.Players[1]}.Data.BodiesHidden"
+                      },
+                      {
+                        "name": "$loc UI_MENU_MATCH_STATS_DISGUISES_USED",
+                        "player1": "{$.MatchStats.Players[0]}.Data.DisguisesUsed",
+                        "player2": "{$.MatchStats.Players[1]}.Data.DisguisesUsed"
+                      },
+                      {
+                        "name": "Disguises Ruined",
+                        "player1": "{$.MatchStats.Players[0]}.Data.DisguisesRuined",
+                        "player2": "{$.MatchStats.Players[1]}.Data.DisguisesRuined"
+                      },
+                      {
+                        "name": "$loc UI_MENU_MATCH_STATS_DEATHS",
+                        "player1": "{$.MatchStats.Players[0]}.Data.Deaths",
+                        "player2": "{$.MatchStats.Players[1]}.Data.Deaths"
+                      }
+                    ]
+                  },
+                  "$else": null
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

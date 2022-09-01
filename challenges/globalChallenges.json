@@ -1,0 +1,268 @@
+[
+  {
+    "Id": "b1a85feb-55af-4707-8271-b3522661c0b1",
+    "GroupId": "00000000-0000-0000-0000-000000000000",
+    "Name": "UI_CHALLENGES_GLOBAL_SILENT_ASSASSIN_FEEDBACK_NAME",
+    "Type": "Statistic",
+    "Description": "UI_CHALLENGES_GLOBAL_SILENT_ASSASSIN_FEEDBACK_DESC",
+    "ImageName": null,
+    "Definition": {
+      "Context": {
+        "Witnesses": [],
+        "KilledTargets": [],
+        "RecordingDestroyed": true,
+        "LastAccidentTime": 0
+      },
+      "Repeatable": {
+        "Base": 1,
+        "Delta": 0
+      },
+      "Scope": "session",
+      "States": {
+        "Start": {
+          "ContractEnd": {
+            "Condition": {
+              "$and": [
+                {
+                  "$eq": [
+                    true,
+                    "$.RecordingDestroyed"
+                  ]
+                },
+                {
+                  "$all": {
+                    "in": "$.Witnesses",
+                    "?": {
+                      "$any": {
+                        "in": "$.KilledTargets",
+                        "?": {
+                          "$eq": [
+                            "$.#",
+                            "$.##"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "Transition": "Success"
+          },
+          "AccidentBodyFound": {
+            "$set": [
+              "LastAccidentTime",
+              "$Timestamp"
+            ]
+          },
+          "Witnesses": {
+            "Condition": {
+              "$any": {
+                "in": "$Value",
+                "?": {
+                  "$pushunique": [
+                    "Witnesses",
+                    "$.#"
+                  ]
+                }
+              }
+            }
+          },
+          "Spotted": {
+            "Condition": {
+              "$any": {
+                "in": "$Value",
+                "?": {
+                  "$pushunique": [
+                    "Witnesses",
+                    "$.#"
+                  ]
+                }
+              }
+            }
+          },
+          "Kill": [
+            {
+              "Condition": {
+                "$and": [
+                  {
+                    "$eq": [
+                      "$Value.IsTarget",
+                      false
+                    ]
+                  },
+                  {
+                    "$not": {
+                      "$eq": [
+                        "$Value.KillContext",
+                        1
+                      ]
+                    }
+                  }
+                ]
+              },
+              "Transition": "Failure"
+            },
+            {
+              "Condition": {
+                "$and": [
+                  {
+                    "$eq": [
+                      "$Value.IsTarget",
+                      false
+                    ]
+                  },
+                  {
+                    "$eq": [
+                      "$Value.KillContext",
+                      1
+                    ]
+                  }
+                ]
+              },
+              "Actions": {
+                "$pushunique": [
+                  "KilledTargets",
+                  "$Value.RepositoryId"
+                ]
+              }
+            },
+            {
+              "Condition": {
+                "$eq": [
+                  "$Value.IsTarget",
+                  true
+                ]
+              },
+              "Actions": {
+                "$pushunique": [
+                  "KilledTargets",
+                  "$Value.RepositoryId"
+                ]
+              }
+            }
+          ],
+          "CrowdNPC_Died": {
+            "Transition": "Failure"
+          },
+          "MurderedBodySeen": [
+            {
+              "Condition": {
+                "$eq": [
+                  "$Value.IsWitnessTarget",
+                  true
+                ]
+              },
+              "Actions": {
+                "$pushunique": [
+                  "Witnesses",
+                  "$Value.Witness"
+                ]
+              }
+            },
+            {
+              "Condition": {
+                "$and": [
+                  {
+                    "$eq": [
+                      "$Value.IsWitnessTarget",
+                      false
+                    ]
+                  },
+                  {
+                    "$not": {
+                      "$eq": [
+                        "$.LastAccidentTime",
+                        "$Timestamp"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "Transition": "Failure"
+            }
+          ],
+          "SecuritySystemRecorder": [
+            {
+              "Actions": {
+                "$set": [
+                  "RecordingDestroyed",
+                  false
+                ]
+              },
+              "Condition": {
+                "$eq": [
+                  "$Value.event",
+                  "spotted"
+                ]
+              }
+            },
+            {
+              "Actions": {
+                "$set": [
+                  "RecordingDestroyed",
+                  true
+                ]
+              },
+              "Condition": {
+                "$or": [
+                  {
+                    "$eq": [
+                      "$Value.event",
+                      "erased"
+                    ]
+                  },
+                  {
+                    "$eq": [
+                      "$Value.event",
+                      "destroyed"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "ContextListeners": {
+        "RecordingDestroyed": {
+          "type": "toggle"
+        },
+        "KilledTargets": {
+          "comparand": "$.Witnesses",
+          "type": "matcharrays"
+        }
+      }
+    },
+    "Tags": [
+      "story",
+      "stats",
+      "hideinhud",
+      "sa-feedback"
+    ],
+    "Drops": [],
+    "LastModified": "2019-10-22T11:38:54.9922012",
+    "Xp": 0,
+    "XpModifier": {},
+    "PlayableSince": null,
+    "PlayableUntil": null,
+    "InclusionData": {
+      "ContractIds": null,
+      "ContractTypes": [
+        "mission",
+        "flashback",
+        "elusive",
+        "escalation",
+        "usercreated",
+        "tutorial",
+        "creation",
+        "orbis",
+        "featured",
+        "campaign",
+        "vsrace"
+      ],
+      "Locations": null,
+      "GameModes": null
+    }
+  }
+]

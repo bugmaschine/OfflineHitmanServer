@@ -1,0 +1,207 @@
+{
+  "$datacontext": {
+    "in": "$.data",
+    "do": {
+      "id": "hub_root",
+      "view": "common.UtcClockInitializer",
+      "controller": "container",
+      "actions": {
+        "activated": [
+          {
+            "set-value": {
+              "target": "$.@global.CurrentBackgroundImage",
+              "value": "images/backgrounds/menu_bg.jpg"
+            },
+            "set-player-profile-xp-data": {
+              "$if $not $isnull $.PlayerProfileXpData": {
+                "$then": {
+                  "playerprofilelevel": "$.PlayerProfileXpData.Level"
+                },
+                "$else": null
+              }
+            }
+          },
+          {
+            "$if $not $isnullorempty $getapplicationoption AutoStartContractId": {
+              "$then": {
+                "set-menu-context": {
+                  "value": {
+                    "onpageopened": {
+                      "set-selected": {
+                        "target": "PLANNING_BUTTON_PLAY"
+                      },
+                      "trigger-input": {
+                        "action": "accept"
+                      }
+                    }
+                  }
+                },
+                "link": {
+                  "page": "planning",
+                  "args": {
+                    "url": "planning",
+                    "args": {
+                      "contractid": "$getapplicationoption AutoStartContractId"
+                    },
+                    "contractid": "$getapplicationoption AutoStartContractId"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "$if $gamepersistentdata attraction_to_hub_flow": {
+              "$then": {
+                "$include": {
+                  "$path": "menusystem/pages/hub/modals/ioiaccount/showmodal_action.json"
+                }
+              }
+            }
+          },
+          {
+            "$if": {
+              "$condition": {
+                "$and": [
+                  "$isuser freeprologue",
+                  "$isininventory ACCESS_HIT_FLAMINGO"
+                ]
+              },
+              "$then": {
+                "set-selected": {
+                  "target": "FSP_Buy"
+                }
+              }
+            }
+          }
+        ],
+        "deactivated": {
+          "set-game-persistent-data": {
+            "key": "attraction_to_hub_flow",
+            "value": false
+          }
+        },
+        "actionx": {
+          "$if $not $isonline": {
+            "$then": {
+              "prompt_label": "$loc UI_BUTTON_PROMPTS_GO_ONLINE",
+              "try-trigger-online": {}
+            },
+            "$else": null
+          }
+        },
+        "actiony": {
+          "$if": {
+            "$condition": {
+              "$and": [
+                "$eq ($platform,pc)",
+                "$isuser freeprologue"
+              ]
+            },
+            "$then": {
+              "$include": {
+                "$path": "menusystem/pages/hub/actions/share.json"
+              }
+            },
+            "$else": null
+          }
+        }
+      },
+      "data": {
+        "direction": "vertical"
+      },
+      "children": [
+        {
+          "$include": {
+            "$path": "menusystem/elements/general/general_headline.json"
+          }
+        },
+        {
+          "$if $gamepersistentdata attraction_to_hub_flow": {
+            "$then": {
+              "$include": {
+                "$path": "menusystem/pages/hub/modals/newunlockable/showmodal_element.json"
+              }
+            }
+          }
+        },
+        {
+          "$if $gamepersistentdata attraction_to_hub_flow": {
+            "$then": {
+              "$include": {
+                "$path": "menusystem/pages/hub/modals/roadmap/showmodal_element.json"
+              }
+            }
+          }
+        },        
+        {
+          "$if $not $isnull $.@global.CurrentBackgroundImage": {
+            "$then": {
+              "selectable": false,
+              "pressable": false,
+              "actions": {
+                "activated": {
+                  "call": {
+                    "onmenuframe": true,
+                    "method": "setBackground",
+                    "args": "$res $.@global.CurrentBackgroundImage"
+                  }
+                }
+              }
+            },
+            "$else": null
+          }
+        },
+        {
+          "controller": "category",
+          "view": "menu3.containers.ScrollingTabsContainer",
+          "direction": "horizontal",
+          "ncols": 10,
+          "data": {
+            "direction": "horizontal",
+            "overflowscrolling": "0.45",
+            "buttonprompts": [
+              {
+                "actiontype": [
+                  "lb",
+                  "rb"
+                ],
+                "actionlabel": "$loc UI_BUTTON_PROMPTS_BROWSE_CATEGORIES"
+              }
+            ]
+          },
+          "children": [
+            {
+              "id": "category_featured",
+              "controller": "categoryitem",
+              "view": "menu3.basic.CategoryElement",
+              "data": {
+                "title": "$loc UI_MENU_PAGE_HUB_FEATURED",
+                "icon": "featured"
+              },
+              "actions": {
+                "activated": {
+                  "set-value": {
+                    "target": "$.@global.CurrentBackgroundImage",
+                    "value": "images/backgrounds/menu_bg.jpg"
+                  }
+                }
+              },
+              "children": [
+                {
+                  "$include": {
+                    "$path": "menusystem/pages/hub/dashboard/dashboard.json"
+                  }
+                }
+              ]
+            },
+            {
+              "$include": {
+                "$path": "menusystem/pages/hub/settings.json"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

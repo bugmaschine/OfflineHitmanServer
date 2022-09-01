@@ -1,0 +1,209 @@
+{
+  "$datacontext": {
+    "in": "$.",
+    "datavalues": {},
+    "do": {
+      "controller": "group",
+      "row": 1,
+      "nrows": 3,
+      "ncols": 10,
+      "layoutchildren": true,
+      "children": {
+        "$mergearrays": [
+          {
+            "view": "menu3.basic.MenuTileLarge",
+            "row": 0,
+            "col": 0,
+            "nrows": 3,
+            "ncols": 4,
+            "data": {
+              "header": "$formatstring {$loc UI_MENU_PAGE_HUB_GAMEMODES} {$loc UI_DIALOG_SLASH} {$loc UI_MENU_GAME_MODE_MULTIPLAYER}",
+              "title": "$loc UI_MENU_PAGE_HUB_GAMEMODE_NEWMODE",
+              "icon": "versus",
+              "image": "$res images/livetile/tile_gamemode_ghost.jpg"
+            },
+            "actions": {
+              "accept": {
+                "$include": {
+                  "$path": "menusystem/elements/multiplayer/gotomultiplayerpresets_actions.json"
+                }
+              },
+              "select": {
+                "replace-children": {
+                  "target": "headline_container",
+                  "children": [
+                    {
+                      "view": "menu3.basic.HeadlineElement",
+                      "selectable": false,
+                      "pressable": false,
+                      "data": {
+                        "header": "$formatstring {$loc UI_MENU_PAGE_HUB_GAMEMODES} {$loc UI_DIALOG_SLASH} {$loc UI_MENU_GAME_MODE_MULTIPLAYER}",
+                        "title": "$loc UI_MENU_PAGE_HUB_GAMEMODE_NEWMODE",
+                        "typeicon": "versus"
+                      }
+                    }
+                  ]
+                }
+              },
+              "deselect": {
+                "replace-children": {
+                  "target": "headline_container",
+                  "children": []
+                }
+              }
+            }
+          },
+          {
+            "view": "menu3.basic.ItemTileSmall",
+            "row": 1.5,
+            "col": 6,
+            "nrows": 1.5,
+            "ncols": 2,
+            "data": {
+              "title": "Go Offline",
+              "icon": "goonline",
+              "image": "$res images/ui/tiles/button_goonline.jpg"
+            },
+            "actions": {
+              "accept": {
+                "force-offline": {}
+              },
+              "select": {
+                "replace-children": {
+                  "target": "headline_container",
+                  "children": [
+                    {
+                      "view": "menu3.basic.HeadlineElement",
+                      "selectable": false,
+                      "pressable": false,
+                      "data": {
+                        "header": "",
+                        "title": "Go Offline",
+                        "typeicon": "goonline"
+                      }
+                    }
+                  ]
+                }
+              },
+              "deselect": {
+                "replace-children": {
+                  "target": "headline_container",
+                  "children": []
+                }
+              }
+            }
+          },
+          {
+            "view": "menu3.basic.ItemTileSmall",
+            "row": 0,
+            "col": 6,
+            "nrows": 1.5,
+            "ncols": 2,
+            "data": {
+              "header": "View GitLab repo",
+              "title": "LocalGhost",
+              "icon": "arrowright",
+              "image": "$res images/livetile/localghost_livetile.png"
+            },
+            "actions": {
+              "accept": {
+                "open-url": {
+                  "url": "https://gitlab.com/grappigegovert/localghost"
+                }
+              },
+              "select": {
+                "replace-children": {
+                  "target": "headline_container",
+                  "children": [
+                    {
+                      "view": "menu3.basic.HeadlineElement",
+                      "selectable": false,
+                      "pressable": false,
+                      "data": {
+                        "header": "https://gitlab.com/grappigegovert/localghost",
+                        "title": "View LocalGhost repo",
+                        "typeicon": "arrowright"
+                      }
+                    }
+                  ]
+                }
+              },
+              "deselect": {
+                "replace-children": {
+                  "target": "headline_container",
+                  "children": []
+                }
+              }
+            }
+          },
+          {
+            "view": "menu3.basic.ItemTileSmall",
+            "row": 0,
+            "col": 4,
+            "nrows": 1.5,
+            "ncols": 2,
+            "data": {
+              "header": "Current Server",
+              "title": "$.ServerTile.title",
+              "icon": "$.ServerTile.icon",
+              "image": "$res $.ServerTile.image"
+            },
+            "actions": {
+              "accept": {
+                "$if $isnullorempty $.ServerTile.url": {
+                  "$then": { },
+                  "$else": {
+                    "open-url": {
+                      "url": "$.ServerTile.url"
+                    }
+                  }
+                }
+              },
+              "select": {
+                "replace-children": {
+                  "target": "headline_container",
+                  "children": [
+                    {
+                      "view": "menu3.basic.HeadlineElement",
+                      "selectable": false,
+                      "pressable": false,
+                      "data": {
+                        "header": "$.ServerTile.select.header",
+                        "title": "$.ServerTile.select.title",
+                        "typeicon": "$.ServerTile.select.icon"
+                      }
+                    }
+                  ]
+                }
+              },
+              "deselect": {
+                "replace-children": {
+                  "target": "headline_container",
+                  "children": []
+                }
+              }
+            }
+          },
+          
+          {
+            "$each $.DashboardData": {
+              "controller": "container",
+              "row": 1.5,
+              "col": 4,
+              "nrows": 1.5,
+              "ncols": 2,
+              "usechilddimensions": true,
+              "children": [
+                {
+                  "$include": {
+                    "$path": "menusystem/pages/hub/dashboard/category_escalation/loadasync.json"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

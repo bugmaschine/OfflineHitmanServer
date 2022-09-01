@@ -1,0 +1,576 @@
+{
+  "id": {
+    "$if $arg LeaderboardFriendsSelected": {
+      "$then": "leaderboard_friends_entries_root",
+      "$else": "leaderboard_entries_root"
+    }
+  },
+  "row": 0,
+  "col": 2,
+  "direction": "vertical",
+  "controller": "list",
+  "children": {
+    "$if $($arraysize $.Entries)": {
+      "$then": {
+        "controller": "list",
+        "children": [
+          {
+            "controller": "list",
+            "direction": "vertical",
+            "children": [
+              {
+                "id": "leaderboard_top_score",
+                "controller": "list",
+                "row": 0,
+                "view": "menu3.containers.ScrollingListContainer",
+                "data": {
+                  "direction": "vertical",
+                  "overflowscrolling": 1
+                },
+                "nrows": 2.492,
+                "ncols": 3.85,
+                "children": {
+                  "$merge": [
+                    {
+                      "$if $.Page": {
+                        "$then": {
+                          "$setup": {
+                            "$set Title": "UI_MENU_PAGE_LEADERBOARDS_PREVIOUS",
+                            "$set PageDirection": -1,
+                            "$in": {
+                              "view": "menu3.basic.ListElementLeaderboardSmall",
+                              "pressable": true,
+                              "data": {
+                                "player": "$loc $.Title"
+                              },
+                              "id": "PrevNextLeaderboard",
+                              "selectable": true,
+                              "actions": {
+                                "accept": {
+                                  "$setup": {
+                                    "$set BlockInput": true,
+                                    "$set PostLoadAction": {
+                                      "set-child-selected": {
+                                        "target": "leaderboard_top_score",
+                                        "selectdirection": "$.PageDirection"
+                                      }
+                                    },
+                                    "$set LeaderboardUrl": {
+                                      "$if $arg LeaderboardFriendsSelected": {
+                                        "$then": "friendsleaderboardentries",
+                                        "$else": "leaderboardentries"
+                                      }
+                                    },
+                                    "$set Target": {
+                                      "$if $arg LeaderboardFriendsSelected": {
+                                        "$then": "leaderboard_friends_entries_root",
+                                        "$else": "leaderboard_entries_root"
+                                      }
+                                    },
+                                    "$in": {
+                                      "load-async": {
+                                        "from": {
+                                          "url": "$.LeaderboardUrl",
+                                          "args": {
+                                            "page": "$.Page",
+                                            "contractid": "$arg ContractId"
+                                          }
+                                        },
+                                        "post-load-action": "$.PostLoadAction",
+                                        "page": "$.Page",
+                                        "pagedirection": "$.PageDirection",
+                                        "target": "$.Target",
+                                        "showloadingindicator": true,
+                                        "blocksinput": "$.BlockInput"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "$else": {
+                          "selectable": false,
+                          "pressable": false,
+                          "nrows": 0,
+                          "ncols": 0
+                        }
+                      }
+                    },
+                    {
+                      "$each $.Entries": {
+                        "view": "menu3.basic.ListElementLeaderboardSmall",
+                        "pressable": "$($user $.LeaderboardData.Player).isresolved",
+                        "showpressableprompt": false,
+                        "data": {
+                          "showningame": {
+                            "$if $arg _isingame": {
+                              "$then": true,
+                              "$else": false
+                            }
+                          },
+                          "rank": "$.LeaderboardData.Rank",
+                          "player": "$($user $.LeaderboardData.Player).name",
+                          "score": "$.LeaderboardData.Score",
+                          "isPlayer": "$.IsPlayer"
+                        },
+                        "stateproviders": [
+                          {
+                            "type": "userresolution",
+                            "target": "player",
+                            "profileid": "$.LeaderboardData.Player"
+                          }
+                        ],
+                        "buttons": [
+                          {
+                            "$if $($user $.LeaderboardData.Player).isresolved": {
+                              "$then": {
+                                "$switch $arg _platform": [
+                                  {
+                                    "case": "pc",
+                                    "return": {}
+                                  },
+                                  {
+                                    "case": "durango",
+                                    "return": {
+                                      "actiontype": "action-y",
+                                      "actionlabel": "$loc UI_BUTTON_PROMPTS_ACTION_PLATFORM_PROFILE_DURANGO"
+                                    }
+                                  },
+                                  {
+                                    "default": {
+                                      "actiontype": "action-y",
+                                      "actionlabel": "$loc UI_BUTTON_PROMPTS_ACTION_PLATFORM_PROFILE"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        ],
+                        "actions": {
+                          "select": [
+                            {
+                              "replace-children": {
+                                "target": "headline_container",
+                                "children": {
+                                  "id": "leaderboard_player_header",
+                                  "view": "menu3.basic.HeadlineElement",
+                                  "selectable": false,
+                                  "pressable": false,
+                                  "data": {
+                                    "title": "$($user $.LeaderboardData.Player).name",
+                                    "typeicon": "profile"
+                                  },
+                                  "stateproviders": [
+                                    {
+                                      "type": "userresolution",
+                                      "target": "title",
+                                      "profileid": "$.LeaderboardData.Player"
+                                    }
+                                  ]
+                                }
+                              },
+                              "set-group-selection": {
+                                "target": {
+                                  "$if $arg LeaderboardFriendsSelected": {
+                                    "$then": "leaderboard_friends_button",
+                                    "$else": "leaderboard_button"
+                                  }
+                                }
+                              },
+                              "hide-node": [
+                                {
+                                  "$if $arg LeaderboardFriendsSelected": {
+                                    "$then": "leaderboard_entries_root",
+                                    "$else": "leaderboard_friends_entries_root"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "replace-children": {
+                                "target": {
+                                  "$if $arg LeaderboardFriendsSelected": {
+                                    "$then": "leaderboard_friends_score_detail",
+                                    "$else": "leaderboard_score_detail"
+                                  }
+                                },
+                                "children": {
+                                  "__comment": "View for displaying detailed score for individual Player (Global, Friends)",
+                                  "view": "menu3.basic.LeaderboardScoreTile",
+                                  "nrows": 3,
+                                  "ncols": 4,
+                                  "pressable": false,
+                                  "selectable": false,
+                                  "data": {
+                                    "header": "$($user $.LeaderboardData.Player).name",
+                                    "icon": "profile"
+                                  },
+                                  "stateproviders": [
+                                    {
+                                      "type": "userresolution",
+                                      "target": "header",
+                                      "profileid": "$.LeaderboardData.Player"
+                                    }
+                                  ],
+                                  "children": [
+                                    {
+                                      "selectable": false,
+                                      "view": "menu3.basic.DetailedScoreTileDetail",
+                                      "data": {
+                                        "showrating": true,
+                                        "rating": "$.LeaderboardData.Data.Score.StarCount",
+                                        "completed": true,
+                                        "isonline": true,
+                                        "difficulty": "$($arg Contract).Metadata.Difficulty",
+                                        "scoresummary": "$.detailedscore.Headlines"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          ],
+                          "deselect": [
+                            {
+                              "replace-children": {
+                                "target": {
+                                  "$if $arg LeaderboardFriendsSelected": {
+                                    "$then": "leaderboard_friends_score_detail",
+                                    "$else": "leaderboard_score_detail"
+                                  }
+                                },
+                                "children": []
+                              }
+                            },
+                            {
+                              "replace-children": {
+                                "target": "headline_container",
+                                "children": []
+                              }
+                            }
+                          ],
+                          "action-y": {
+                            "$switch $arg _platform": [
+                              {
+                                "case": "pc",
+                                "return": {}
+                              },
+                              {
+                                "default": {
+                                  "show-player-profile-dialog": {
+                                    "profileId": "$.LeaderboardData.Player"
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "$if $.HasMore": {
+                        "$then": {
+                          "$setup": {
+                            "$set Title": "UI_MENU_PAGE_LEADERBOARDS_NEXT",
+                            "$set PageDirection": 1,
+                            "$in": {
+                              "view": "menu3.basic.ListElementLeaderboardSmall",
+                              "pressable": true,
+                              "data": {
+                                "player": "$loc $.Title"
+                              },
+                              "id": "PrevNextLeaderboard",
+                              "selectable": true,
+                              "actions": {
+                                "accept": {
+                                  "$setup": {
+                                    "$set BlockInput": true,
+                                    "$set PostLoadAction": {
+                                      "set-child-selected": {
+                                        "target": "leaderboard_top_score",
+                                        "selectdirection": "$.PageDirection"
+                                      }
+                                    },
+                                    "$set LeaderboardUrl": {
+                                      "$if $arg LeaderboardFriendsSelected": {
+                                        "$then": "friendsleaderboardentries",
+                                        "$else": "leaderboardentries"
+                                      }
+                                    },
+                                    "$set Target": {
+                                      "$if $arg LeaderboardFriendsSelected": {
+                                        "$then": "leaderboard_friends_entries_root",
+                                        "$else": "leaderboard_entries_root"
+                                      }
+                                    },
+                                    "$in": {
+                                      "load-async": {
+                                        "from": {
+                                          "url": "$.LeaderboardUrl",
+                                          "args": {
+                                            "page": "$.Page",
+                                            "contractid": "$arg ContractId"
+                                          }
+                                        },
+                                        "post-load-action": "$.PostLoadAction",
+                                        "page": "$.Page",
+                                        "pagedirection": "$.PageDirection",
+                                        "target": "$.Target",
+                                        "showloadingindicator": true,
+                                        "blocksinput": "$.BlockInput"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "$else": {
+                          "selectable": false,
+                          "pressable": false,
+                          "nrows": 0,
+                          "ncols": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "leaderboard_self",
+                "controller": "list",
+                "row": 2.75,
+                "children": {
+                  "$if $.PlayerEntry": {
+                    "$then": {
+                      "$use $.PlayerEntry": {
+                        "$setup": {
+                          "$set IsPlayer": true,
+                          "$in": {
+                            "view": "menu3.basic.ListElementLeaderboardSmall",
+                            "pressable": "$($user $.LeaderboardData.Player).isresolved",
+                            "showpressableprompt": false,
+                            "data": {
+                              "showningame": {
+                                "$if $arg _isingame": {
+                                  "$then": true,
+                                  "$else": false
+                                }
+                              },
+                              "rank": "$.LeaderboardData.Rank",
+                              "player": "$($user $.LeaderboardData.Player).name",
+                              "score": "$.LeaderboardData.Score",
+                              "isPlayer": "$.IsPlayer"
+                            },
+                            "stateproviders": [
+                              {
+                                "type": "userresolution",
+                                "target": "player",
+                                "profileid": "$.LeaderboardData.Player"
+                              }
+                            ],
+                            "buttons": [
+                              {
+                                "$if $($user $.LeaderboardData.Player).isresolved": {
+                                  "$then": {
+                                    "$switch $arg _platform": [
+                                      {
+                                        "case": "pc",
+                                        "return": {}
+                                      },
+                                      {
+                                        "case": "durango",
+                                        "return": {
+                                          "actiontype": "action-y",
+                                          "actionlabel": "$loc UI_BUTTON_PROMPTS_ACTION_PLATFORM_PROFILE_DURANGO"
+                                        }
+                                      },
+                                      {
+                                        "default": {
+                                          "actiontype": "action-y",
+                                          "actionlabel": "$loc UI_BUTTON_PROMPTS_ACTION_PLATFORM_PROFILE"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            ],
+                            "actions": {
+                              "select": [
+                                {
+                                  "replace-children": {
+                                    "target": "headline_container",
+                                    "children": {
+                                      "id": "leaderboard_player_header",
+                                      "view": "menu3.basic.HeadlineElement",
+                                      "selectable": false,
+                                      "pressable": false,
+                                      "data": {
+                                        "title": "$($user $.LeaderboardData.Player).name",
+                                        "typeicon": "profile"
+                                      },
+                                      "stateproviders": [
+                                        {
+                                          "type": "userresolution",
+                                          "target": "title",
+                                          "profileid": "$.LeaderboardData.Player"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "set-group-selection": {
+                                    "target": {
+                                      "$if $arg LeaderboardFriendsSelected": {
+                                        "$then": "leaderboard_friends_button",
+                                        "$else": "leaderboard_button"
+                                      }
+                                    }
+                                  },
+                                  "hide-node": [
+                                    {
+                                      "$if $arg LeaderboardFriendsSelected": {
+                                        "$then": "leaderboard_entries_root",
+                                        "$else": "leaderboard_friends_entries_root"
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "replace-children": {
+                                    "target": {
+                                      "$if $arg LeaderboardFriendsSelected": {
+                                        "$then": "leaderboard_friends_score_detail",
+                                        "$else": "leaderboard_score_detail"
+                                      }
+                                    },
+                                    "children": {
+                                      "__comment": "View for displaying detailed score for individual Player (Global, Friends)",
+                                      "view": "menu3.basic.LeaderboardScoreTile",
+                                      "nrows": 3,
+                                      "ncols": 4,
+                                      "pressable": false,
+                                      "selectable": false,
+                                      "data": {
+                                        "header": "$($user $.LeaderboardData.Player).name",
+                                        "icon": "profile"
+                                      },
+                                      "stateproviders": [
+                                        {
+                                          "type": "userresolution",
+                                          "target": "header",
+                                          "profileid": "$.LeaderboardData.Player"
+                                        }
+                                      ],
+                                      "children": [
+                                        {
+                                          "selectable": false,
+                                          "view": "menu3.basic.DetailedScoreTileDetail",
+                                          "data": {
+                                            "showrating": true,
+                                            "rating": "$.LeaderboardData.Data.Score.StarCount",
+                                            "completed": true,
+                                            "isonline": true,
+                                            "difficulty": "$($arg Contract).Metadata.Difficulty",
+                                            "scoresummary": "$.detailedscore.Headlines"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ],
+                              "deselect": [
+                                {
+                                  "replace-children": {
+                                    "target": {
+                                      "$if $arg LeaderboardFriendsSelected": {
+                                        "$then": "leaderboard_friends_score_detail",
+                                        "$else": "leaderboard_score_detail"
+                                      }
+                                    },
+                                    "children": []
+                                  }
+                                },
+                                {
+                                  "replace-children": {
+                                    "target": "headline_container",
+                                    "children": []
+                                  }
+                                }
+                              ],
+                              "action-y": {
+                                "$switch $arg _platform": [
+                                  {
+                                    "case": "pc",
+                                    "return": {}
+                                  },
+                                  {
+                                    "default": {
+                                      "show-player-profile-dialog": {
+                                        "profileId": "$.LeaderboardData.Player"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "$else": {
+                      "view": "menu3.basic.ListElementLeaderboardSmall",
+                      "pressable": false,
+                      "selectable": false,
+                      "data": {
+                        "infotext": "$loc UI_MENU_PAGE_LEADERBOARDS_NO_PLAYER_SCORE",
+                        "isPlayer": true
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": {
+              "$if $arg LeaderboardFriendsSelected": {
+                "$then": "leaderboard_friends_score_detail",
+                "$else": "leaderboard_score_detail"
+              }
+            },
+            "row": 0,
+            "col": 4,
+            "selectable": false,
+            "pressable": false
+          }
+        ]
+      },
+      "$else": {
+        "$setup": {
+          "$set Title": "$loc UI_MENU_ELEMENT_NO_CONTENT",
+          "$in": {
+            "view": "menu3.basic.DefaultNoContentHeader",
+            "selectable": false,
+            "pressable": false,
+            "data": {
+              "header": "$.Header",
+              "title": "$.Title",
+              "typeicon": {
+                "$if $.Icon": {
+                  "$then": "$.Icon",
+                  "$else": "info"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

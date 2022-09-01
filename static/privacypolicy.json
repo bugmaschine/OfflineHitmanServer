@@ -1,0 +1,31 @@
+{
+  "view": "menu3.modal.ModalDialogGeneric",
+  "priority": "gdprconsent",
+  "type": "gdprconsent",
+  "buttons": [
+    {
+      "label": "$loc UI_DIALOG_ONLINE_GDPR_CHECK_DESCRIPTION",
+      "type": "checkbox",
+      "icon": "check"
+    },
+    {
+      "label": "$loc UI_DIALOG_ACCEPT",
+      "type": "ok"
+    },
+    {
+      "label": "$loc UI_DIALOG_DECLINE",
+      "type": "cancel"
+    }
+  ],
+  "data": {
+    "title": "$loc UI_DIALOG_ONLINE_GDPR_TITLE",
+    "frameheightmax": 600,
+    "dialogWidth": 1250,
+    "typeoverride": "online",
+    "information": [
+      {
+        "description": "Only connect to Custom servers that you trust. A ton of game data is sent to it, and I have no control over how servers may use it."
+      }
+    ]
+  }
+}
